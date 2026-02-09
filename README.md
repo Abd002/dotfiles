@@ -21,3 +21,6 @@ cd dotfiles
 ln -s "$PWD/nvim" ~/.config/nvim
 ln -s "$PWD/.tmux.conf" ~/.tmux.conf
 ln -s "$PWD/.clang-format" ~/.clang-format
+ln -s "$PWD/starship" ~/.config/starship
+ln -s "$PWD/zsh" ~/.config/zsh
+
