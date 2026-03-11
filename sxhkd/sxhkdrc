@@ -1,0 +1,5 @@
+super + Return
+    x-terminal-emulator
+
+super + space 
+    ~/.config/rofi/scripts/rofi-hub.sh

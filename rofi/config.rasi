@@ -1,4 +1,5 @@
 configuration {
+    dpi: 60;
     modi: "drun";
     show-icons: true;
     display-drun: "";
@@ -10,48 +11,50 @@ configuration {
 @theme "/dev/null"
 
 * {
-    bg: #11121D;
-    bg-alt: #444b6a;
+    bg: rgba(17,18,29,0.80);
+    bg-alt: rgba(68,75,106,0.80);
     fg: #FFFFFF;
     fg-alt: #9ca0b0;
     blue: #7aa2f7;
-    
+
     background-color: transparent;
     text-color: @fg;
-    font: "JetBrainsMono Nerd Font 11"; /* Make sure you have a Nerd Font installed! */
+    font: "JetBrainsMono Nerd Font 11";
 }
 
 window {
-    width: 35%;
+    width: 15%;
     transparency: "real";
     background-color: @bg;
-    border: 2px;
+    border: 0.12em;
     border-color: @blue;
-    border-radius: 12px;
+    border-radius: 0.75em;
     padding: 0;
 }
 
 mainbox {
     children: [ inputbar, listview ];
-    padding: 20px;
+    padding: 1.2em;
+    background-color: transparent;
 }
 
 inputbar {
     children: [ prompt, entry ];
     background-color: @bg-alt;
-    border-radius: 8px;
-    padding: 12px;
-    margin: 0 0 15px 0;
+    border-radius: 0.5em;
+    padding: 0.75em;
+    margin: 0 0 0.9em 0;
 }
 
 prompt {
     text-color: @blue;
-    padding: 0 10px 0 5px;
+    padding: 0 0.6em 0 0.3em;
 }
 
 entry {
     placeholder: "Search...";
     placeholder-color: @fg-alt;
+    background-color: transparent;
 }
 
 listview {
@@ -59,25 +62,29 @@ listview {
     columns: 1;
     fixed-height: true;
     scrollbar: false;
-    spacing: 5px;
+    spacing: 0.3em;
+    background-color: transparent;
 }
 
 element {
-    padding: 10px;
-    border-radius: 8px;
+    padding: 0.6em;
+    border-radius: 0.5em;
     orientation: horizontal;
+    background-color: transparent;
 }
 
 element selected {
-    background-color: @blue;
-    text-color: @bg;
+    background-color: rgba(122,162,247,0.85);
+    text-color: #11121D;
 }
 
 element-icon {
-    size: 24px;
-    padding: 0 10px 0 0;
+    size: 1.6em;
+    padding: 0 0.6em 0 0;
+    background-color: transparent;
 }
 
 element-text {
     vertical-align: 0.5;
+    background-color: transparent;
 }

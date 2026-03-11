@@ -33,7 +33,7 @@ local themes = {
 require('lazy').setup({
   require(themes[env_var_nvim_theme]),
   require 'plugins.telescope',
-  require 'plugins.treesitter',
+  -- require 'plugins.treesitter',
   require 'plugins.lsp',
   require 'plugins.autocompletion',
   require 'plugins.none-ls',
@@ -54,6 +54,7 @@ require('lazy').setup({
   require 'plugins.aerial',
   require 'plugins.vim-tmux-navigator',
   require 'plugins.ai-complation',
+  require 'plugins.codex',
 }, {
   ui = {
     -- If you have a Nerd Font, set icons to an empty table which will use the
