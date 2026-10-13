@@ -5,6 +5,10 @@ return {
   -- Database
   {
     'tpope/vim-dadbod',
+    keys = {
+      { '<leader>Du', '<cmd>DBUIToggle<cr>', desc = 'Database UI' },
+      { '<leader>Df', '<cmd>DBUIFindBuffer<cr>', desc = 'Attach buffer to a database' },
+    },
     -- lazy = true,
     dependencies = {
       'kristijanhusak/vim-dadbod-ui',

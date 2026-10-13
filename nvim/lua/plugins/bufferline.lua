@@ -1,7 +1,6 @@
 return {
   'akinsho/bufferline.nvim',
   dependencies = {
-    'moll/vim-bbye',
     'nvim-tree/nvim-web-devicons',
   },
   config = function()
@@ -12,8 +11,8 @@ return {
         mode = 'buffers', -- set to "tabs" to only show tabpages instead
         themable = true, -- allows highlight groups to be overriden i.e. sets highlights as default
         numbers = 'none', -- | "ordinal" | "buffer_id" | "both" | function({ ordinal, id, lower, raise }): string,
-        close_command = 'Bdelete! %d', -- can be a string | function, see "Mouse actions"
-        right_mouse_command = 'Bdelete! %d', -- can be a string | function, see "Mouse actions"
+        close_command = function(n) Snacks.bufdelete(n) end, -- can be a string | function, see "Mouse actions"
+        right_mouse_command = function(n) Snacks.bufdelete(n) end, -- can be a string | function, see "Mouse actions"
         left_mouse_command = 'buffer %d', -- can be a string | function, see "Mouse actions"
         middle_mouse_command = nil, -- can be a string | function, see "Mouse actions"
         -- buffer_close_icon = '󰅖',
@@ -66,7 +65,7 @@ return {
 
     -- Keymaps
     local opts = { noremap = true, silent = true, desc = 'Go to Buffer' }
-    vim.keymap.set('n', '<leader>q', '<cmd>bdelete<cr>', { desc = 'Close buffer' })
+    -- close a buffer with <leader>bd (snacks.lua)
     -- vim.keymap.set("n", "<Tab>", "<Cmd>BufferLineCycleNext<CR>", {})
     -- vim.keymap.set("n", "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", {})
     -- vim.keymap.set('n', '<leader>1', "<cmd>lua require('bufferline').go_to_buffer(1)<CR>", opts)

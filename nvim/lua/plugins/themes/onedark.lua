@@ -62,15 +62,7 @@ return {
     end
     set_diagnostics_bg_transparency()
 
-    -- Toggle background transparency
-    local toggle_transparency = function()
-      config.transparent = not config.transparent
-      onedark.setup(config)
-      onedark.load()
-      set_diagnostics_bg_transparency()
-    end
-
-    vim.keymap.set('n', '<leader>bg', toggle_transparency, { noremap = true, silent = true })
+    -- Transparent panels and popups + <leader>ut toggle: lua/core/transparency.lua
   end,
 }
 

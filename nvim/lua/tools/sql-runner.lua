@@ -266,9 +266,9 @@ vim.api.nvim_create_user_command('SelectSqlCmd', M.select_command, {})
 vim.api.nvim_create_user_command('RunSQL', M.run_sql, { range = true })
 
 -- Set up keymaps
-vim.keymap.set('v', '<leader>pr', ':RunSQL<CR>', { silent = true, desc = 'Run SQL with selected backend' })
-vim.keymap.set('n', '<leader>ps', ':SelectSqlCmd<CR>', { silent = true, desc = 'Select SQL backend' })
-vim.keymap.set('n', '<leader>pa', ':AddSqlCmd<CR>', { silent = true, desc = 'Add SQL command' })
-vim.keymap.set('n', '<leader>px', ':RemoveSqlCmd<CR>', { silent = true, desc = 'Remove SQL command' })
+vim.keymap.set('v', '<leader>Dr', ':RunSQL<CR>', { silent = true, desc = 'Run SQL with selected backend' })
+vim.keymap.set('n', '<leader>Ds', ':SelectSqlCmd<CR>', { silent = true, desc = 'Select SQL backend' })
+vim.keymap.set('n', '<leader>Da', ':AddSqlCmd<CR>', { silent = true, desc = 'Add SQL command' })
+vim.keymap.set('n', '<leader>Dx', ':RemoveSqlCmd<CR>', { silent = true, desc = 'Remove SQL command' })
 
 return M

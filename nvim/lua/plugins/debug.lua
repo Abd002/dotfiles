@@ -33,6 +33,7 @@ return {
         -- Update this to ensure that you have the debuggers for the langs you want
         -- 'delve',
         'debugpy',
+        'codelldb', -- Rust and C/C++ (rustaceanvim picks it up for <leader>rd too)
       },
     }
 
@@ -41,10 +42,20 @@ return {
     vim.keymap.set('n', '<F1>', dap.step_into, { desc = 'Debug: Step Into' })
     vim.keymap.set('n', '<F2>', dap.step_over, { desc = 'Debug: Step Over' })
     vim.keymap.set('n', '<F3>', dap.step_out, { desc = 'Debug: Step Out' })
-    vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint, { desc = 'Debug: Toggle Breakpoint' })
-    vim.keymap.set('n', '<leader>B', function()
-      dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
-    end, { desc = 'Debug: Set Breakpoint' })
+    -- d: debug (F-keys above still work)
+    local map = function(lhs, rhs, desc) vim.keymap.set('n', lhs, rhs, { desc = 'Debug: ' .. desc }) end
+    map('<leader>db', dap.toggle_breakpoint, 'Toggle breakpoint')
+    map('<leader>dB', function() dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ') end, 'Conditional breakpoint')
+    map('<leader>dc', dap.continue, 'Start / continue')
+    map('<leader>dC', dap.run_to_cursor, 'Run to cursor')
+    map('<leader>di', dap.step_into, 'Step into')
+    map('<leader>do', dap.step_over, 'Step over')
+    map('<leader>dO', dap.step_out, 'Step out')
+    map('<leader>dl', dap.run_last, 'Run last')
+    map('<leader>dr', dap.repl.toggle, 'Toggle REPL')
+    map('<leader>dt', dap.terminate, 'Terminate')
+    map('<leader>du', function() require('dapui').toggle() end, 'Toggle debugger UI')
+    map('<leader>de', function() require('dapui').eval() end, 'Evaluate expression under cursor')
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|

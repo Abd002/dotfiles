@@ -1,0 +1,16 @@
+{
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "space",
+        description: Some("rofi-hub"),
+    ): Spawn("@HOME@/.config/rofi/scripts/rofi-hub.sh"),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "Return",
+        description: Some("terminal"),
+    ): Spawn("cosmic-term"),
+}

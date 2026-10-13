@@ -3,7 +3,6 @@ require 'core.keymaps' -- Load general keymaps
 require 'core.snippets' -- Custom code snippets
 require 'core.templates' -- Custom file templates
 require 'tools.sql-runner'
-require 'tools.wezterm-img-preview'
 
 -- Install package manager
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -32,19 +31,17 @@ local themes = {
 -- Setup plugins
 require('lazy').setup({
   require(themes[env_var_nvim_theme]),
-  require 'plugins.telescope',
-  -- require 'plugins.treesitter',
+  require 'plugins.snacks', -- picker, explorer, dashboard, terminal, lazygit, notifications
+  require 'plugins.editor', -- which-key menu, flash, trouble, todo, search & replace, surround, sessions
+  require 'plugins.treesitter',
   require 'plugins.lsp',
-  require 'plugins.autocompletion',
-  require 'plugins.none-ls',
+  require 'plugins.completion', -- blink.cmp + LuaSnip
+  require 'plugins.formatting', -- conform + nvim-lint
+  require 'plugins.rust', -- rustaceanvim + crates.nvim
+  require 'plugins.cpp', -- clangd extras
   require 'plugins.lualine',
   require 'plugins.bufferline',
-  require 'plugins.neo-tree',
   require 'plugins.oil',
-  require 'plugins.alpha',
-  require 'plugins.indent-blankline',
-  require 'plugins.lazygit',
-  require 'plugins.comment',
   require 'plugins.debug',
   require 'plugins.gitsigns',
   require 'plugins.database',
@@ -53,7 +50,8 @@ require('lazy').setup({
   -- require 'plugins.avante',
   require 'plugins.aerial',
   require 'plugins.vim-tmux-navigator',
-  require 'plugins.ai-complation',
+  require 'plugins.ai-complation', -- Codeium
+  require 'plugins.claude', -- Claude Code
   require 'plugins.codex',
 }, {
   ui = {
@@ -77,25 +75,10 @@ require('lazy').setup({
   },
 })
 
--- Function to check if a file exists
-local function file_exists(file)
-  local f = io.open(file, 'r')
-  if f then
-    f:close()
-    return true
-  else
-    return false
-  end
-end
+-- Glass background: let the terminal's transparency show through (toggle with <leader>ut)
+require('core.transparency').setup()
 
--- Path to the session file
-local session_file = '.session.vim'
-
--- Check if the session file exists in the current directory
-if file_exists(session_file) then
-  -- Source the session file
-  vim.cmd('source ' .. session_file)
-end
+-- Sessions: persistence.nvim saves one per folder; restore with <leader>qs or from the dashboard.
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

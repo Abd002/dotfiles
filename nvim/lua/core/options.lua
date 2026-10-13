@@ -46,7 +46,10 @@ vim.opt.runtimepath:remove '/usr/share/vim/vimfiles' -- separate vim plugins fro
 vim.api.nvim_create_autocmd({ 'InsertLeave', 'TextChanged', 'FocusLost' }, {
   callback = function()
     if vim.bo.modified and vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
+      -- background auto-save: conform skips formatting while this flag is set
+      vim.b.autosaving = true
       vim.cmd 'silent! w'
+      vim.b.autosaving = false
     end
   end,
 })

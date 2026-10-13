@@ -28,20 +28,6 @@ return {
     -- Execute the function once after loading the colorscheme
     -- set_menu_border_transparency()
 
-    local bg_transparent = true
-
-    -- Toggle background transparency
-    local toggle_transparency = function()
-      bg_transparent = not bg_transparent
-      if bg_transparent then
-        vim.g.nord_disable_background = true
-        vim.cmd [[colorscheme nord]]
-      else
-        vim.g.nord_disable_background = false
-        vim.cmd [[colorscheme nord]]
-      end
-    end
-
-    vim.keymap.set('n', '<leader>bg', toggle_transparency, { noremap = true, silent = true })
+    -- Transparent panels and popups + <leader>ut toggle: lua/core/transparency.lua
   end,
 }

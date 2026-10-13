@@ -31,37 +31,14 @@ return {
     -- end, { desc = 'Open harpoon window' })
 
     -- Default UI
-    vim.keymap.set('n', '<leader>M', function()
-      harpoon.ui:toggle_quick_menu(harpoon:list())
-    end)
-
-    vim.keymap.set('n', '<leader>m', function()
-      harpoon:list():add()
-    end)
-
-    vim.keymap.set('n', '<leader>1', function()
-      harpoon:list():select(1)
-    end)
-
-    vim.keymap.set('n', '<leader>2', function()
-      harpoon:list():select(2)
-    end)
-
-    vim.keymap.set('n', '<leader>3', function()
-      harpoon:list():select(3)
-    end)
-
-    vim.keymap.set('n', '<leader>4', function()
-      harpoon:list():select(4)
-    end)
-
-    -- Toggle previous & next buffers stored within Harpoon list
-    vim.keymap.set('n', '<leader>p', function()
-      harpoon:list():prev()
-    end)
-
-    vim.keymap.set('n', '<leader>n', function()
-      harpoon:list():next()
-    end)
+    local map = function(lhs, rhs, desc) vim.keymap.set('n', lhs, rhs, { desc = 'Harpoon: ' .. desc }) end
+    -- h: harpoon (pin up to 4 files per project, jump to them instantly)
+    map('<leader>ha', function() harpoon:list():add() end, 'Pin this file')
+    map('<leader>hh', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, 'Menu (reorder / remove)')
+    map('<leader>hn', function() harpoon:list():next() end, 'Next pinned file')
+    map('<leader>hp', function() harpoon:list():prev() end, 'Previous pinned file')
+    for i = 1, 4 do
+      map('<leader>' .. i, function() harpoon:list():select(i) end, 'Go to pinned file ' .. i)
+    end
   end,
 }

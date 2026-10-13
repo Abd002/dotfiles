@@ -1,0 +1,651 @@
+<title>Neovim Keys</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+/* Layout: masonry of key groups (CSS columns), led by a "learn these first" strip; keys drawn as keycaps.
+   Palette: Nord (the editor's own theme) — Snow Storm in light, Polar Night in dark. */
+:root {
+  --bg: #eceff4;
+  --surface: #f8f9fb;
+  --ink: #2e3440;
+  --muted: #5b6579;
+  --line: #d8dee9;
+  --accent: #5e81ac;
+  --accent-soft: #dfe7f1;
+  --key-bg: #ffffff;
+  --key-edge: #c7cfdc;
+  --key-ink: #2e3440;
+  --tag-rust: #b5643f;
+  --tag-c: #4f77a3;
+  --tag-ai: #8a5c86;
+  --tag-git: #6c8a4b;
+  --mark: #ebcb8b;
+  --font-ui: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-key: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #242933; --surface: #2e3440; --ink: #eceff4; --muted: #a9b3c4; --line: #3b4252;
+    --accent: #88c0d0; --accent-soft: #34404f; --key-bg: #3b4252; --key-edge: #1f242c; --key-ink: #eceff4;
+    --tag-rust: #d08770; --tag-c: #81a1c1; --tag-ai: #b48ead; --tag-git: #a3be8c; --mark: #ebcb8b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #242933; --surface: #2e3440; --ink: #eceff4; --muted: #a9b3c4; --line: #3b4252;
+  --accent: #88c0d0; --accent-soft: #34404f; --key-bg: #3b4252; --key-edge: #1f242c; --key-ink: #eceff4;
+  --tag-rust: #d08770; --tag-c: #81a1c1; --tag-ai: #b48ead; --tag-git: #a3be8c; --mark: #ebcb8b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 64px; }
+
+header.top { display: grid; gap: 14px; margin-bottom: 26px; }
+h1 {
+  font-family: var(--font-key); font-weight: 700; font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: -0.02em; margin: 0; text-wrap: balance;
+}
+h1 .cursor { display: inline-block; width: 0.55em; height: 1em; background: var(--accent); vertical-align: -0.12em; margin-left: 4px; }
+@media (prefers-reduced-motion: no-preference) { h1 .cursor { animation: blink 1.1s steps(1) infinite; } }
+@keyframes blink { 50% { opacity: 0; } }
+.lede { margin: 0; color: var(--muted); max-width: 70ch; }
+.lede strong { color: var(--ink); font-weight: 600; }
+
+.tools { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.search { position: relative; flex: 1 1 280px; max-width: 460px; }
+.search input {
+  width: 100%; font: 500 15px var(--font-ui); color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px 12px 10px 36px;
+}
+.search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.search svg { position: absolute; left: 11px; top: 50%; translate: 0 -50%; width: 16px; height: 16px; fill: none; stroke: var(--muted); stroke-width: 2; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; color: var(--muted); font-size: 13px; align-items: center; }
+
+/* Keycaps */
+kbd {
+  font-family: var(--font-key); font-size: 12.5px; font-weight: 600; color: var(--key-ink);
+  background: var(--key-bg); border: 1px solid var(--key-edge); border-bottom-width: 2.5px;
+  border-radius: 5px; padding: 1px 6px; min-width: 1.9em; display: inline-block; text-align: center;
+  line-height: 1.5; white-space: nowrap;
+}
+kbd.leader { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+kbd.mod { font-weight: 400; }
+.keys { display: inline-flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.keys .or { color: var(--muted); font-size: 12px; padding-inline: 2px; }
+.keys .plus { color: var(--muted); font-size: 11px; }
+
+/* Learn first */
+.first {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 18px 20px 20px; margin-bottom: 28px;
+}
+.first h2, .group h2 { font-family: var(--font-key); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+.first p { margin: 6px 0 14px; color: var(--muted); font-size: 14px; }
+.first ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px 22px; counter-reset: k; }
+.first li { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: baseline; min-width: 0; }
+.first li .d { font-size: 14px; }
+
+/* Groups */
+.groups { columns: 3 340px; column-gap: 22px; }
+.group {
+  break-inside: avoid; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 16px 12px; margin-bottom: 22px;
+}
+.group header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.group header .sub { color: var(--muted); font-size: 12.5px; }
+.group h3 {
+  font-family: var(--font-key); font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--muted); margin: 12px 0 4px; font-weight: 600;
+}
+table { width: 100%; border-collapse: collapse; }
+td { padding: 4px 0; vertical-align: baseline; border-top: 1px solid var(--line); }
+tr:first-child td { border-top: 0; }
+td.k { width: 1%; padding-right: 12px; white-space: nowrap; }
+td.d { font-size: 14px; min-width: 0; }
+.tag {
+  display: inline-block; font-family: var(--font-key); font-size: 10.5px; font-weight: 600;
+  padding: 0 5px; border-radius: 4px; margin-left: 6px; vertical-align: 1px;
+  border: 1px solid currentColor; letter-spacing: 0.02em;
+}
+.tag.rust { color: var(--tag-rust); }
+.tag.c { color: var(--tag-c); }
+.tag.ai { color: var(--tag-ai); }
+.tag.git { color: var(--tag-git); }
+.tag.mode { color: var(--muted); }
+mark { background: var(--mark); color: #2e3440; border-radius: 3px; padding: 0 1px; }
+
+/* Old → new */
+.moved { margin-top: 10px; }
+.moved table td { font-size: 14px; }
+.moved .arrow { color: var(--muted); padding-inline: 8px; }
+
+.empty { color: var(--muted); padding: 24px 0; }
+footer { color: var(--muted); font-size: 13px; margin-top: 8px; max-width: 80ch; }
+footer code { font-family: var(--font-key); font-size: 12.5px; }
+
+@media (max-width: 520px) {
+  body { font-size: 14px; }
+  .first ol { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Neovim Keys<span class="cursor" aria-hidden="true"></span></h1>
+    <p class="lede">Every key in your config, grouped the way the editor groups them. <kbd class="leader">Space</kbd> is the <strong>leader</strong>: press it and wait a moment, and a menu lists every group. In Neovim, <kbd class="leader">Space</kbd><kbd>K</kbd> opens this sheet (search it with <kbd>/</kbd>), <kbd class="leader">Space</kbd><kbd>s</kbd><kbd>K</kbd> fuzzy-searches it, and <kbd class="leader">Space</kbd><kbd>?</kbd> shows the keys for the current file.</p>
+    <div class="tools">
+      <label class="search" for="q">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input id="q" type="search" placeholder="Filter: rename, git, claude, ]d …" autocomplete="off">
+      </label>
+      <div class="legend">
+        <span><span class="tag rust">rust</span> Rust files</span>
+        <span><span class="tag c">c/c++</span> C and C++ files</span>
+        <span><span class="tag git">git</span> files in a git repo</span>
+        <span><span class="tag mode">visual</span> after selecting text</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="first" id="first">
+    <h2>Learn these first</h2>
+    <p>Eighteen keys cover most of a day of coding. Use only these for a week, then add a group at a time.</p>
+    <ol id="first-list"></ol>
+  </section>
+
+  <div class="groups" id="groups"></div>
+  <p class="empty" id="empty" hidden>No key matches that filter.</p>
+
+  <footer>Generated from the live keymaps in <code>~/dotfiles/nvim</code> (143 leader keys, no clashes). Plugin keys live in each <code>lua/plugins/*.lua</code> file, the group names in <code>lua/plugins/editor.lua</code>.</footer>
+</div>
+
+<script>
+// Key notation: "<leader>" = Space, <C-x> = Ctrl+x, <S-x> = Shift+x, <A-x> = Alt+x, "|" separates alternatives.
+const FIRST = [
+  ['<leader><leader>', 'Find a file'],
+  ['<leader>/', 'Search text in the project'],
+  ['<leader>,', 'Switch between open files'],
+  ['<leader>e', 'File explorer sidebar'],
+  ['-', 'Open the folder as an editable list (oil)'],
+  ['<S-h>|<S-l>', 'Previous / next open file'],
+  ['gd', 'Go to definition'],
+  ['gr', 'Find references'],
+  ['K', 'Show documentation'],
+  ['<leader>ca', 'Code action (quick fixes, imports)'],
+  ['<leader>cr', 'Rename symbol everywhere'],
+  ['s', 'Jump anywhere: type 2 letters, then the label'],
+  ['<leader>ac', 'Open Claude Code'],
+  ['<C-s>', 'Save (and format)'],
+  ['<C-/>', 'Comment / uncomment'],
+  [']d|[d', 'Next / previous problem'],
+  ['<leader>gg', 'Lazygit'],
+  ['<leader>K', 'This cheat sheet inside Neovim'],
+];
+
+const GROUPS = [
+  { key: 'a', name: 'AI', sub: 'Claude Code and Codex', sections: [
+    ['Claude Code', [
+      ['<leader>ac', 'Open / close Claude panel'],
+      ['<leader>af', 'Focus Claude panel'],
+      ['<leader>ab', 'Add this file to the conversation'],
+      ['<leader>as', 'Send selection to Claude', 'visual'],
+      ['<leader>as', 'Add file under cursor (in oil or explorer)'],
+      ['<leader>aa', 'Accept Claude’s edit (or :w in the diff)'],
+      ['<leader>ad', 'Reject Claude’s edit (or :q in the diff)'],
+      ['<leader>aD', 'Close all pending diffs'],
+      ['<leader>aC', 'Continue the last conversation'],
+      ['<leader>ar', 'Resume a past conversation'],
+      ['<leader>am', 'Choose model'],
+      ['<leader>aS', 'Connection status'],
+    ]],
+    ['Codex', [
+      ['<leader>ao', 'Open Codex'],
+      ['<leader>at', 'Toggle Codex terminal'],
+      ['<leader>ap', 'Send file path'],
+      ['<leader>ax', 'Send selection', 'visual'],
+      ['<leader>aX', 'Send selection as reference', 'visual'],
+    ]],
+  ]},
+  { key: 'c', name: 'Code', sub: 'language server, format, outline', sections: [
+    ['', [
+      ['<leader>ca', 'Code action', 'n/visual'],
+      ['<leader>cr', 'Rename symbol'],
+      ['<leader>cR', 'Rename file (updates imports)'],
+      ['<leader>cf', 'Format file / selection'],
+      ['<leader>cd', 'Problems on this line'],
+      ['<leader>cw', 'Change word, then . for the next match'],
+      ['<leader>cs|<leader>cS', 'Swap parameter with next / previous'],
+      ['<leader>co', 'Outline sidebar (functions, types)'],
+      ['<leader>cO', 'Outline navigator'],
+      ['<leader>cl', 'Language server info'],
+      ['<leader>cL', 'Restart language server'],
+      ['<leader>cF', 'Formatter info'],
+      ['<leader>cM', 'Mason: install language tools'],
+    ]],
+    ['C and C++ files', [
+      ['<leader>ch', 'Switch header ↔ source', 'c'],
+      ['<leader>cA', 'Syntax tree (AST) of node', 'c'],
+      ['<leader>ct', 'Type hierarchy', 'c'],
+      ['<leader>ci', 'Symbol info', 'c'],
+      ['<leader>cm', 'clangd memory usage', 'c'],
+    ]],
+  ]},
+  { key: 'r', name: 'Rust', sub: 'only in .rs files and Cargo.toml', sections: [
+    ['Rust files', [
+      ['<leader>rr', 'Run: pick a binary / example', 'rust'],
+      ['<leader>rR', 'Run the last one again', 'rust'],
+      ['<leader>rt', 'Test: pick a test', 'rust'],
+      ['<leader>rT', 'Run the last test again', 'rust'],
+      ['<leader>rd', 'Debug: pick a target', 'rust'],
+      ['<leader>re', 'Expand macro', 'rust'],
+      ['<leader>rx', 'Explain error (rustc --explain)', 'rust'],
+      ['<leader>rD', 'Full diagnostic, like cargo shows it', 'rust'],
+      ['<leader>rc', 'Open Cargo.toml', 'rust'],
+      ['<leader>rp', 'Go to parent module', 'rust'],
+      ['<leader>rk|<leader>rJ', 'Move item (fn, struct…) up / down', 'rust'],
+      ['<leader>rj', 'Join lines (Rust-aware)', 'rust'],
+      ['<leader>ca', 'Code actions, grouped', 'rust'],
+      ['K', 'Hover with actions (run, debug, refs)', 'rust'],
+    ]],
+    ['Cargo.toml', [
+      ['<leader>rv', 'Versions of the crate under cursor', 'rust'],
+      ['<leader>rf', 'Features of the crate', 'rust'],
+      ['<leader>ru', 'Upgrade this crate', 'rust'],
+      ['<leader>rU', 'Upgrade all crates', 'rust'],
+      ['<leader>rs', 'Open docs.rs', 'rust'],
+      ['<leader>rh', 'Open homepage', 'rust'],
+    ]],
+  ]},
+  { key: 'g', name: 'Git', sub: 'lazygit, history, hunks', sections: [
+    ['', [
+      ['<leader>gg', 'Lazygit (full git UI)'],
+      ['<leader>gs', 'Status'],
+      ['<leader>gd', 'Changed hunks'],
+      ['<leader>gl', 'Log (project)'],
+      ['<leader>gf', 'Log of this file'],
+      ['<leader>gL', 'Log of this line'],
+      ['<leader>gb', 'Branches'],
+      ['<leader>gS', 'Stash'],
+      ['<leader>go', 'Open on GitHub', 'n/visual'],
+    ]],
+    ['Hunks (changed blocks)', [
+      [']h|[h', 'Next / previous hunk', 'git'],
+      ['<leader>ghp', 'Preview hunk', 'git'],
+      ['<leader>ghs', 'Stage hunk (or selection)', 'git'],
+      ['<leader>ghr', 'Reset hunk (or selection)', 'git'],
+      ['<leader>ghS', 'Stage whole file', 'git'],
+      ['<leader>ghR', 'Reset whole file', 'git'],
+      ['<leader>ghb', 'Blame this line', 'git'],
+      ['<leader>ghB', 'Blame whole file', 'git'],
+      ['<leader>ghd', 'Diff against index', 'git'],
+      ['<leader>ghD', 'Diff against last commit', 'git'],
+      ['<leader>ub', 'Inline blame on / off', 'git'],
+      ['ih', 'Text object: the hunk (dih, vih)', 'git'],
+    ]],
+  ]},
+  { key: 'f', name: 'Find', sub: 'files and folders', sections: [
+    ['', [
+      ['<leader><leader>', 'Find files (smart: recent + git)'],
+      ['<leader>ff', 'Files'],
+      ['<leader>fg', 'Git files'],
+      ['<leader>fr', 'Recent files'],
+      ['<leader>fb|<leader>,', 'Open buffers'],
+      ['<leader>fp', 'Projects'],
+      ['<leader>fc', 'Neovim config files'],
+      ['<leader>e|<leader>fe', 'File explorer sidebar'],
+      ['-', 'Folder as editable text (oil)'],
+    ]],
+  ]},
+  { key: 's', name: 'Search', sub: 'text, symbols, everything else', sections: [
+    ['', [
+      ['<leader>/|<leader>sg', 'Grep the project'],
+      ['<leader>sw', 'Word under cursor / selection', 'n/visual'],
+      ['<leader>sb', 'Lines in this file'],
+      ['<leader>sB', 'Grep open buffers'],
+      ['<leader>sr', 'Search & replace across project', 'n/visual'],
+      ['<leader>ss', 'Symbols in this file'],
+      ['<leader>sS', 'Symbols in project'],
+      ['<leader>sd|<leader>sD', 'Diagnostics: project / file'],
+      ['<leader>st', 'TODO / FIXME comments'],
+      ['<leader>K', 'This cheat sheet, inside Neovim (search with /)'],
+      ['<leader>sK', 'Fuzzy-search this cheat sheet'],
+      ['<leader>sk', 'Keymaps (live, from the config)'],
+      ['<leader>sh', 'Help pages'],
+      ['<leader>sc', 'Commands'],
+      ['<leader>s:', 'Command history'],
+      ['<leader>sm', 'Marks'],
+      ['<leader>sj', 'Jump list'],
+      ['<leader>sq', 'Quickfix list'],
+      ['<leader>su', 'Undo history'],
+      ['<leader>s"', 'Registers'],
+      ['<leader>sn', 'Notification history'],
+      ['<leader>sR', 'Resume last search'],
+    ]],
+    ['Inside any picker', [
+      ['<C-j>|<C-k>', 'Move down / up'],
+      ['<CR>', 'Open'],
+      ['<Esc>', 'Close'],
+    ]],
+  ]},
+  { key: 'x', name: 'Problems', sub: 'trouble panel', sections: [
+    ['', [
+      ['<leader>xx', 'Diagnostics (project)'],
+      ['<leader>xX', 'Diagnostics (this file)'],
+      ['<leader>xs', 'Symbols'],
+      ['<leader>xr', 'References / definitions'],
+      ['<leader>xq', 'Quickfix list'],
+      ['<leader>xl', 'Location list'],
+      ['<leader>xt', 'TODOs'],
+    ]],
+  ]},
+  { key: 'd', name: 'Debug', sub: 'nvim-dap, codelldb for Rust and C/C++', sections: [
+    ['', [
+      ['<leader>db', 'Toggle breakpoint'],
+      ['<leader>dB', 'Conditional breakpoint'],
+      ['<leader>dc|<F5>', 'Start / continue'],
+      ['<leader>di|<F1>', 'Step into'],
+      ['<leader>do|<F2>', 'Step over'],
+      ['<leader>dO|<F3>', 'Step out'],
+      ['<leader>dC', 'Run to cursor'],
+      ['<leader>dl', 'Run last'],
+      ['<leader>de', 'Evaluate expression under cursor'],
+      ['<leader>du|<F7>', 'Debugger UI'],
+      ['<leader>dr', 'REPL'],
+      ['<leader>dt', 'Stop debugging'],
+    ]],
+  ]},
+  { key: 'b', name: 'Buffers', sub: 'open files', sections: [
+    ['', [
+      ['<S-h>|<S-l>', 'Previous / next buffer'],
+      ['[b|]b', 'Previous / next buffer'],
+      ['<leader>bb', 'Back to the last buffer'],
+      ['<leader>bd', 'Close buffer'],
+      ['<leader>bo', 'Close all other buffers'],
+      ['<leader>bn', 'New empty buffer'],
+      ['<leader>bs', 'Scratch buffer'],
+      ['<leader>bw', 'Save without formatting'],
+    ]],
+  ]},
+  { key: 'w', name: 'Windows', sub: 'Space w works like Ctrl+w', sections: [
+    ['', [
+      ['<leader>||<leader>wv', 'Split right'],
+      ['<leader>_|<leader>ws', 'Split below'],
+      ['<leader>wq', 'Close window'],
+      ['<leader>w=', 'Make windows equal size'],
+      ['<leader>wo', 'Close all other windows'],
+      ['<C-h>|<C-j>|<C-k>|<C-l>', 'Move between windows and tmux panes'],
+      ['<Up>|<Down>|<Left>|<Right>', 'Resize window'],
+      ['<leader>uZ', 'Zoom this window'],
+    ]],
+  ]},
+  { key: 'u', name: 'Toggles', sub: 'turn things on and off', sections: [
+    ['', [
+      ['<leader>uf', 'Format on save'],
+      ['<leader>ud', 'Diagnostics'],
+      ['<leader>uh', 'Inlay hints (types, parameter names)'],
+      ['<leader>uw', 'Line wrap'],
+      ['<leader>ul', 'Relative line numbers'],
+      ['<leader>us', 'Spell check'],
+      ['<leader>ug', 'Indent guides'],
+      ['<leader>uT', 'Treesitter highlighting'],
+      ['<leader>uD', 'Dim inactive code'],
+      ['<leader>ut', 'Transparent background'],
+      ['<leader>uz', 'Zen mode'],
+    ]],
+  ]},
+  { key: 'h', name: 'Harpoon', sub: 'pin 4 files, jump instantly', sections: [
+    ['', [
+      ['<leader>ha', 'Pin this file'],
+      ['<leader>hh', 'Menu: reorder / remove pins'],
+      ['<leader>1|<leader>2|<leader>3|<leader>4', 'Go to pin 1–4'],
+      ['<leader>hn|<leader>hp', 'Next / previous pin'],
+    ]],
+  ]},
+  { key: 'q', name: 'Session', sub: 'one saved session per folder', sections: [
+    ['', [
+      ['<leader>qs', 'Restore this folder’s session'],
+      ['<leader>ql', 'Restore the last session'],
+      ['<leader>qS', 'Pick a session'],
+      ['<leader>qd', 'Don’t save this session'],
+      ['<leader>qq', 'Quit Neovim'],
+    ]],
+  ]},
+  { key: 'D', name: 'Database', sub: 'dadbod and your SQL runner', sections: [
+    ['', [
+      ['<leader>Du', 'Database UI'],
+      ['<leader>Df', 'Attach this buffer to a database'],
+      ['<leader>Dr', 'Run selected SQL', 'visual'],
+      ['<leader>Ds', 'Choose SQL backend'],
+      ['<leader>Da', 'Add SQL command'],
+      ['<leader>Dx', 'Remove SQL command'],
+    ]],
+  ]},
+  { key: 't', name: 'Terminal & tabs', sub: '', sections: [
+    ['', [
+      ['<leader>tt', 'Terminal (floating)'],
+      ['<leader>to', 'New tab'],
+      ['<leader>tx', 'Close tab'],
+      ['<leader>tn|<leader>tp', 'Next / previous tab'],
+    ]],
+  ]},
+  { key: 'g', keyLabel: 'g', name: 'Go to', sub: 'language server jumps, no leader', sections: [
+    ['', [
+      ['gd', 'Definition'],
+      ['gr', 'References'],
+      ['gI', 'Implementation'],
+      ['gy', 'Type definition'],
+      ['gD', 'Declaration (C: the header)'],
+      ['K', 'Documentation'],
+      ['gK', 'Signature help'],
+      ['<C-s>', 'Signature help', 'insert'],
+      ['<C-o>|<C-i>', 'Jump back / forward'],
+    ]],
+  ]},
+  { key: ']', name: 'Next / previous', sub: '] goes forward, [ goes back', sections: [
+    ['', [
+      [']d|[d', 'Problem (diagnostic)'],
+      [']e|[e', 'Error only'],
+      ['[[|]]', 'Other uses of the word under cursor'],
+      [']m|[m', 'Function start'],
+      [']M|[M', 'Function end'],
+      [']c|[c', 'Class start'],
+      [']C|[C', 'Class end'],
+      [']h|[h', 'Git hunk', 'git'],
+      [']t|[t', 'TODO comment'],
+      [']q|[q', 'Quickfix item'],
+      [']b|[b', 'Buffer'],
+      ['}|{', 'Next / previous symbol (outline)'],
+    ]],
+  ]},
+  { key: 's', keyLabel: 's', name: 'Move & edit', sub: 'no leader', sections: [
+    ['Moving', [
+      ['s', 'Flash: jump to any spot (2 letters, then label)'],
+      ['S', 'Flash: select a code block'],
+      ['<C-d>|<C-u>', 'Half page down / up (centred)'],
+      ['n|N', 'Next / previous search match (centred)'],
+    ]],
+    ['Editing', [
+      ['jk|kj', 'Leave insert mode', 'insert'],
+      ['<C-s>', 'Save and format'],
+      ['<C-/>|<C-c>', 'Comment line / selection'],
+      ['gc', 'Comment with a motion (gcap = paragraph)'],
+      ['<A-j>|<A-k>', 'Move line or selection down / up'],
+      ['<|>', 'Indent selection (stays selected)', 'visual'],
+      ['p', 'Paste over selection, keep clipboard', 'visual'],
+      ['x', 'Delete character, keep clipboard'],
+      ['<leader>y|<leader>Y', 'Copy to system clipboard'],
+      ['<leader>+|<leader>-', 'Increment / decrement number'],
+      ['<C-q>', 'Close window'],
+    ]],
+    ['Surround', [
+      ['gsa', 'Add: gsaiw" wraps a word in quotes'],
+      ['gsd', 'Delete: gsd" removes quotes'],
+      ['gsr', 'Replace: gsr"\' turns " into \''],
+    ]],
+    ['Text objects (after d, c, y, v)', [
+      ['af|if', 'Function (around / inside)'],
+      ['ac|ic', 'Class'],
+      ['aa|ia', 'Parameter'],
+    ]],
+  ]},
+  { key: '<Tab>', keyLabel: 'Tab', name: 'Completion', sub: 'while typing', sections: [
+    ['', [
+      ['<C-j>|<C-k>', 'Next / previous suggestion', 'insert'],
+      ['<Tab>|<S-Tab>', 'Next / previous suggestion', 'insert'],
+      ['<CR>', 'Accept', 'insert'],
+      ['<C-Space>', 'Show suggestions / docs', 'insert'],
+      ['<C-e>', 'Hide', 'insert'],
+      ['<C-l>|<C-h>', 'Jump to next / previous snippet field', 'insert'],
+      ['<C-b>|<C-f>', 'Scroll docs', 'insert'],
+      ['<C-g>', 'Accept Codeium AI suggestion', 'insert'],
+    ]],
+  ]},
+  { key: '-', keyLabel: '-', name: 'Oil', sub: 'a folder you edit like text', sections: [
+    ['', [
+      ['-', 'Open parent folder'],
+      ['<CR>', 'Open file / folder'],
+      ['<C-s>|<C-h>', 'Open in split right / below'],
+      ['<C-p>', 'Preview'],
+      ['g.', 'Show hidden files'],
+      ['g?', 'All oil keys'],
+      [':w', 'Apply renames, moves and deletes you typed'],
+    ]],
+  ]},
+];
+
+const MOVED = [
+  ['<leader>lg', '<leader>gg', 'Lazygit'],
+  ['<leader>sf', '<leader>ff', 'Find files (or <leader><leader>)'],
+  ['<leader>so', '<leader>fr', 'Recent files'],
+  ['<leader>w', '<leader>e', 'File explorer'],
+  ['<leader>x', '<leader>bd', 'Close buffer'],
+  ['<leader>b', '<leader>bn', 'New buffer'],
+  ['<leader>b', '<leader>db', 'Breakpoint (was the same key)'],
+  ['<Tab>|<S-Tab>', '<S-l>|<S-h>', 'Next / previous buffer'],
+  ['<leader>rn', '<leader>cr', 'Rename'],
+  ['<leader>d', '<leader>cd', 'Line diagnostics'],
+  ['<leader>do', '<leader>ud', 'Diagnostics on / off'],
+  ['<leader>th', '<leader>uh', 'Inlay hints on / off'],
+  ['<leader>lw', '<leader>uw', 'Line wrap'],
+  ['<leader>ds', '<leader>ss', 'Symbols in file'],
+  ['<leader>ws', '<leader>sS', 'Symbols in project'],
+  ['<leader>D', 'gy', 'Type definition'],
+  ['<leader>q', '<leader>xx', 'Diagnostics list'],
+  ['<leader>v|<leader>h', '<leader>||<leader>_', 'Split right / below'],
+  ['<leader>xs', '<leader>wq', 'Close split'],
+  ['<leader>se', '<leader>w=', 'Equal splits'],
+  ['<leader>m|<leader>M', '<leader>ha|<leader>hh', 'Harpoon add / menu'],
+  ['<leader>n|<leader>p', '<leader>hn|<leader>hp', 'Harpoon next / previous'],
+  ['<leader>o', '<leader>co', 'Outline'],
+  ['<leader>a|<leader>A', '<leader>cs|<leader>cS', 'Swap parameter'],
+  [']c|[c', ']h|[h', 'Git hunks (]c is now class)'],
+  ['<leader>hp', '<leader>ghp', 'Preview hunk'],
+  ['<leader>lv|<leader>sl', '<leader>qs', 'Sessions (saved automatically now)'],
+  ['<leader>sn', '<leader>bw', 'Save without formatting'],
+  ['<leader>j', '<leader>cw', 'Change word, repeat with .'],
+  ['<leader>co|<leader>ct', '<leader>ao|<leader>at', 'Codex'],
+  ['<leader>pr|<leader>ps', '<leader>Dr|<leader>Ds', 'SQL runner'],
+  ['<leader>bg', '<leader>ut', 'Transparent background'],
+];
+
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const NAMES = { CR: 'Enter', Esc: 'Esc', Tab: 'Tab', Up: '↑', Down: '↓', Left: '←', Right: '→', Space: 'Space' };
+
+// One key sequence -> keycaps. Splits "<leader>gh" into [Space][g][h], "<C-s>" into [Ctrl][s].
+function caps(seq) {
+  const out = [];
+  const re = /<leader>|<[^>]+>|./g;
+  let m;
+  while ((m = re.exec(seq))) {
+    const t = m[0];
+    if (t === '<leader>') { out.push('<kbd class="leader">Space</kbd>'); continue; }
+    const mod = t.match(/^<([CSA])-(.+)>$/);
+    if (mod) {
+      const name = { C: 'Ctrl', S: 'Shift', A: 'Alt' }[mod[1]];
+      const k = NAMES[mod[2]] || mod[2];
+      out.push(`<kbd class="mod">${name}</kbd><span class="plus">+</span><kbd>${esc(k)}</kbd>`);
+      continue;
+    }
+    const named = t.match(/^<(.+)>$/);
+    if (named && t.length > 1) { out.push(`<kbd>${esc(NAMES[named[1]] || named[1])}</kbd>`); continue; }
+    out.push(`<kbd>${esc(t)}</kbd>`);
+  }
+  return out.join('');
+}
+// "a|b" -> alternatives; a lone "|" (or "<leader>|" for split right) is a real key
+function keysHtml(spec) {
+  const alts = spec.split(/\|(?=.)/).filter(Boolean);
+  const fixed = [];
+  for (let i = 0; i < alts.length; i++) {
+    if (alts[i] === '<leader>' ) { fixed.push('<leader>|'); continue; }
+    if (alts[i] === '<' && alts[i + 1] === '>') { fixed.push('<', '>'); i++; continue; }
+    fixed.push(alts[i]);
+  }
+  return '<span class="keys">' + fixed.map(caps).join('<span class="or">or</span>') + '</span>';
+}
+const TAGS = { rust: ['rust', 'rust'], c: ['c', 'c/c++'], git: ['git', 'git'], visual: ['mode', 'visual'], 'n/visual': ['mode', '+visual'], insert: ['mode', 'insert'] };
+function tagHtml(t) { if (!t) return ''; const [cls, label] = TAGS[t]; return ` <span class="tag ${cls}">${label}</span>`; }
+function plainKeys(spec) { return spec.replace(/<leader>/g, 'space ').replace(/[<>]/g, ' '); }
+
+function render() {
+  document.getElementById('first-list').innerHTML = FIRST.map(([k, d]) =>
+    `<li data-s="${esc((plainKeys(k) + ' ' + d).toLowerCase())}">${keysHtml(k)}<span class="d">${esc(d)}</span></li>`).join('');
+
+  const groups = GROUPS.map(g => {
+    const label = g.keyLabel ? `<kbd>${esc(g.keyLabel)}</kbd>` : `<kbd class="leader">Space</kbd><kbd>${esc(g.key)}</kbd>`;
+    const sections = g.sections.map(([title, rows]) => {
+      const trs = rows.map(([k, d, t]) => {
+        const s = (plainKeys(k) + ' ' + d + ' ' + (t || '') + ' ' + g.name + ' ' + title).toLowerCase();
+        return `<tr data-s="${esc(s)}"><td class="k">${keysHtml(k)}</td><td class="d">${esc(d)}${tagHtml(t)}</td></tr>`;
+      }).join('');
+      return (title ? `<h3>${esc(title)}</h3>` : '') + `<table>${trs}</table>`;
+    }).join('');
+    return `<section class="group"><header>${label}<div><h2>${esc(g.name)}</h2>${g.sub ? `<div class="sub">${esc(g.sub)}</div>` : ''}</div></header>${sections}</section>`;
+  });
+
+  const moved = MOVED.map(([o, n, d]) => {
+    const s = (plainKeys(o) + ' ' + plainKeys(n) + ' ' + d + ' moved old new').toLowerCase();
+    return `<tr data-s="${esc(s)}"><td class="k">${keysHtml(o)}<span class="arrow">→</span>${keysHtml(n)}</td><td class="d">${esc(d)}</td></tr>`;
+  }).join('');
+  groups.push(`<section class="group moved"><header><kbd>↻</kbd><div><h2>Moved keys</h2><div class="sub">old key → new key, for muscle memory</div></div></header><table>${moved}</table></section>`);
+
+  document.getElementById('groups').innerHTML = groups.join('');
+}
+
+function filter(q) {
+  q = q.trim().toLowerCase();
+  let any = false;
+  document.querySelectorAll('[data-s]').forEach(el => {
+    const hit = !q || el.dataset.s.includes(q);
+    el.hidden = !hit;
+    if (hit) any = true;
+  });
+  document.querySelectorAll('.group').forEach(g => {
+    g.hidden = q !== '' && !g.querySelector('[data-s]:not([hidden])');
+    g.querySelectorAll('h3').forEach(h => {
+      const t = h.nextElementSibling;
+      h.hidden = q !== '' && t && !t.querySelector('[data-s]:not([hidden])');
+    });
+  });
+  document.getElementById('first').hidden = q !== '' && !document.querySelector('#first-list [data-s]:not([hidden])');
+  document.getElementById('empty').hidden = any;
+}
+
+render();
+const input = document.getElementById('q');
+input.addEventListener('input', () => filter(input.value));
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement !== input) { e.preventDefault(); input.focus(); }
+  if (e.key === 'Escape' && document.activeElement === input) { input.value = ''; filter(''); input.blur(); }
+});
+</script>

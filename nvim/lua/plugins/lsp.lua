@@ -26,8 +26,8 @@ return {
       },
     },
 
-    -- Allows extra capabilities provided by nvim-cmp
-    'hrsh7th/cmp-nvim-lsp',
+    -- Completion capabilities
+    'saghen/blink.cmp',
   },
   config = function()
     vim.api.nvim_create_autocmd('LspAttach', {
@@ -35,56 +35,26 @@ return {
       -- Create a function that lets us more easily define mappings specific LSP related items.
       -- It sets the mode, buffer and description for us each time.
       callback = function(event)
-        local map = function(keys, func, desc)
-          vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+        local map = function(keys, func, desc, mode)
+          vim.keymap.set(mode or 'n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
         end
 
-        -- Jump to the definition of the word under your cursor.
-        --  This is where a variable was first declared, or where a function is defined, etc.
-        --  To jump back, press <C-T>.
-        map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+        -- Go to (no leader): the classic Vim "g" motions
+        map('gd', function() Snacks.picker.lsp_definitions() end, 'Go to definition')
+        map('gr', function() Snacks.picker.lsp_references() end, 'References')
+        map('gI', function() Snacks.picker.lsp_implementations() end, 'Go to implementation')
+        map('gy', function() Snacks.picker.lsp_type_definitions() end, 'Go to type definition')
+        map('gD', vim.lsp.buf.declaration, 'Go to declaration')
+        map('K', vim.lsp.buf.hover, 'Hover documentation')
+        map('gK', vim.lsp.buf.signature_help, 'Signature help')
+        vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help, { buffer = event.buf, desc = 'LSP: Signature help' })
 
-        -- Find references for the word under your cursor.
-        map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-
-        -- Jump to the implementation of the word under your cursor.
-        --  Useful when your language has ways of declaring types without an actual implementation.
-        map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-
-        -- Jump to the type of the word under your cursor.
-        --  Useful when you're not sure what type a variable is and you want to see
-        --  the definition of its *type*, not where it was *defined*.
-        map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-
-        -- Fuzzy find all the symbols in your current document.
-        --  Symbols are things like variables, functions, types, etc.
-        map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-
-        -- Fuzzy find all the symbols in your current workspace
-        --  Similar to document symbols, except searches over your whole project.
-        map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-
-        -- Rename the variable under your cursor
-        --  Most Language Servers support renaming across files, etc.
-        map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-
-        -- Execute a code action, usually your cursor needs to be on top of an error
-        -- or a suggestion from your LSP for this to activate.
-        map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-
-        -- Opens a popup that displays documentation about the word under your cursor
-        --  See `:help K` for why this keymap
-        map('K', vim.lsp.buf.hover, 'Hover Documentation')
-
-        -- WARN: This is not Goto Definition, this is Goto Declaration.
-        --  For example, in C this would take you to the header
-        map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-        map('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
-        map('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-        map('<leader>wl', function()
-          print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-        end, '[W]orkspace [L]ist Folders')
+        -- c: code
+        map('<leader>ca', vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
+        map('<leader>cr', vim.lsp.buf.rename, 'Rename symbol')
+        map('<leader>cR', function() Snacks.rename.rename_file() end, 'Rename file (updates imports)')
+        map('<leader>cl', '<cmd>checkhealth vim.lsp<cr>', 'LSP info')
+        map('<leader>cL', '<cmd>lsp restart<cr>', 'Restart LSP')
 
         -- The following two autocommands are used to highlight references of the
         -- word under your cursor when your cursor rests there for a little while.
@@ -114,29 +84,9 @@ return {
           })
         end
 
-        -- The following code creates a keymap to toggle inlay hints in your
-        -- code, if the language server you are using supports them
+        -- Inlay hints on by default; toggle with <leader>uh
         if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-          map('<leader>th', function()
-            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-          end, '[T]oggle Inlay [H]ints')
-        end
-
-        -- Enable formatting for Rust files with rust_analyzer
-        if client and client.name == 'rust_analyzer' then
-          local augroup = vim.api.nvim_create_augroup('rust_format', { clear = false })
-          vim.api.nvim_clear_autocmds { group = augroup, buffer = event.buf }
-          vim.api.nvim_create_autocmd('BufWritePre', {
-            group = augroup,
-            buffer = event.buf,
-            callback = function()
-              vim.lsp.buf.format {
-                bufnr = event.buf,
-                async = false,
-                timeout_ms = 5000,
-              }
-            end,
-          })
+          vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
         end
       end,
     })
@@ -145,8 +95,7 @@ return {
     -- By default, Neovim doesn't support everything that is in the LSP specification.
     -- When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
     -- So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+    local capabilities = require('blink.cmp').get_lsp_capabilities()
 
     -- Enable the following language servers
     --
@@ -193,212 +142,7 @@ return {
           },
         },
       },
-      rust_analyzer = {
-        settings = {
-          ['rust-analyzer'] = {
-            -- Cargo settings
-            cargo = {
-              allFeatures = true,
-              allTargets = true,
-              buildScripts = {
-                enable = true,
-              },
-            },
-            -- Check/Clippy settings
-            check = {
-              command = 'clippy',
-              extraArgs = { '--all-targets', '--all-features' },
-            },
-            checkOnSave = true,
-            
-            -- Inlay hints (annotations)
-            inlayHints = {
-              enable = true,
-              closureReturnTypeHints = {
-                enable = 'with_block',
-              },
-              lifetimeElisionHints = {
-                enable = true,
-                useParameterNames = true,
-              },
-              reborrowHints = {
-                enable = true,
-              },
-              renderColons = true,
-              typeHints = {
-                enable = true,
-                hideClosureInitialization = false,
-                hideNamedConstructor = false,
-              },
-              chainingHints = {
-                enable = true,
-              },
-              bindingModeHints = {
-                enable = true,
-              },
-              implicitDrops = {
-                enable = true,
-              },
-            },
-            
-            -- Hover documentation
-            hover = {
-              documentation = {
-                enable = true,
-              },
-              actions = {
-                enable = true,
-                implementations = {
-                  enable = true,
-                },
-                references = {
-                  enable = true,
-                },
-                run = {
-                  enable = true,
-                },
-              },
-            },
-            
-            -- Diagnostics
-            diagnostics = {
-              enable = true,
-              disabled = {},
-              warningsAsHint = {},
-              warningsAsInfo = {},
-            },
-            
-            -- Code lenses
-            lens = {
-              enable = true,
-              debug = {
-                enable = true,
-              },
-              forceCustomCommands = true,
-              implementations = {
-                enable = true,
-              },
-              references = {
-                adt = {
-                  enable = true,
-                },
-                enumVariant = {
-                  enable = true,
-                },
-                method = {
-                  enable = true,
-                },
-                trait = {
-                  enable = true,
-                },
-              },
-              run = {
-                enable = true,
-              },
-            },
-            
-            -- Semantic tokens (syntax highlighting)
-            semanticTokens = {
-              enable = true,
-            },
-            
-            -- Completion
-            completion = {
-              callable = {
-                snippets = 'fill_arguments',
-              },
-              privateEditable = {
-                enable = false,
-              },
-              postfix = {
-                enable = true,
-              },
-              snippets = {
-                custom = {
-                  Arc = {
-                    postfix = 'arc',
-                    body = 'Arc::new(${receiver})',
-                    requires = 'std::sync::Arc',
-                    description = 'Put the expression in an `Arc`',
-                    scope = 'expr',
-                  },
-                  Box = {
-                    postfix = 'box',
-                    body = 'Box::new(${receiver})',
-                    requires = 'std::boxed::Box',
-                    description = 'Put the expression in a `Box`',
-                    scope = 'expr',
-                  },
-                  Ok = {
-                    postfix = 'ok',
-                    body = 'Ok(${receiver})',
-                    description = 'Wrap the expression in a `Result::Ok`',
-                    scope = 'expr',
-                  },
-                  Err = {
-                    postfix = 'err',
-                    body = 'Err(${receiver})',
-                    description = 'Wrap the expression in a `Result::Err`',
-                    scope = 'expr',
-                  },
-                  Some = {
-                    postfix = 'some',
-                    body = 'Some(${receiver})',
-                    description = 'Wrap the expression in an `Option::Some`',
-                    scope = 'expr',
-                  },
-                },
-              },
-            },
-            
-            -- Imports
-            imports = {
-              granularity = {
-                enforce = false,
-              },
-              group = {
-                enable = true,
-              },
-              merge = {
-                glob = true,
-              },
-              prefix = 'crate',
-            },
-            
-            -- File operations
-            files = {
-              excludeDirs = { '.cargo', '.git', '.github', '.rust-analyzer', '.vscode', 'target' },
-              watcher = 'client',
-            },
-            
-            -- Proc macros
-            procMacro = {
-              enable = true,
-            },
-            
-            -- Macro expansion
-            expandMacros = {
-              enable = true,
-            },
-          },
-        },
-      },
-      -- basedpyright = {
-      --   -- Config options: https://github.com/DetachHead/basedpyright/blob/main/docs/settings.md
-      --   settings = {
-      --     basedpyright = {
-      --       disableOrganizeImports = true, -- Using Ruff's import organizer
-      --       disableLanguageServices = false,
-      --       analysis = {
-      --         ignore = { '*' },                 -- Ignore all files for analysis to exclusively use Ruff for linting
-      --         typeCheckingMode = 'off',
-      --         diagnosticMode = 'openFilesOnly', -- Only analyze open files
-      --         useLibraryCodeForTypes = true,
-      --         autoImportCompletions = true,     -- whether pyright offers auto-import completions
-      --       },
-      --     },
-      --   },
-      -- },
+      -- rust_analyzer: started by rustaceanvim (plugins/rust.lua), not here
       ruff = {},
       jsonls = {},
       sqlls = {},
@@ -414,6 +158,15 @@ return {
       -- ltex = {},
       -- texlab = {},
       clangd = {
+        cmd = {
+          'clangd',
+          '--background-index',
+          '--clang-tidy',
+          '--header-insertion=iwyu',
+          '--completion-style=detailed',
+          '--function-arg-placeholders',
+          '--fallback-style=llvm',
+        },
         settings = {
           clangd = {
             InlayHints = {
@@ -430,7 +183,15 @@ return {
     -- Ensure the servers and tools above are installed
     local ensure_installed = vim.tbl_keys(servers or {})
     vim.list_extend(ensure_installed, {
-      'stylua', -- Used to format Lua code
+      'rust-analyzer', -- used by rustaceanvim
+      'codelldb', -- debugger for Rust and C/C++
+      -- formatters / linters used by conform + nvim-lint (plugins/formatting.lua)
+      'stylua',
+      'prettier',
+      'shfmt',
+      'clang-format',
+      'eslint_d',
+      'checkmake',
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

@@ -17,25 +17,6 @@ return {
     'tpope/vim-rhubarb',
   },
   {
-    -- Hints keybinds
-    'folke/which-key.nvim',
-    opts = {
-      delay = 3000,
-      -- win = {
-      --   border = {
-      --     { '┌', 'FloatBorder' },
-      --     { '─', 'FloatBorder' },
-      --     { '┐', 'FloatBorder' },
-      --     { '│', 'FloatBorder' },
-      --     { '┘', 'FloatBorder' },
-      --     { '─', 'FloatBorder' },
-      --     { '└', 'FloatBorder' },
-      --     { '│', 'FloatBorder' },
-      --   },
-      -- },
-    },
-  },
-  {
     -- Autoclose parentheses, brackets, quotes, etc.
     'windwp/nvim-autopairs',
     event = 'InsertEnter',
@@ -43,17 +24,9 @@ return {
     opts = {},
   },
   {
-    -- Highlight todo, notes, etc in comments
-    'folke/todo-comments.nvim',
-    event = 'VimEnter',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    opts = { signs = false },
-  },
-  {
-    -- high-performance color highlighter
-    'norcalli/nvim-colorizer.lua',
-    config = function()
-      require('colorizer').setup()
-    end,
+    -- Show colours like #81A1C1 in their colour (maintained fork of norcalli/nvim-colorizer)
+    'catgoose/nvim-colorizer.lua',
+    event = 'BufReadPre',
+    opts = {},
   },
 }
